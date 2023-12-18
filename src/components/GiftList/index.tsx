@@ -1,0 +1,105 @@
+"use client";
+
+import React from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import uniqBy from "lodash/uniqBy";
+import { CellMeasurerCache, createMasonryCellPositioner } from "react-virtualized";
+import { useElementSize } from "@mantine/hooks";
+import { CellMeasurerCacheInterface } from "react-virtualized/dist/es/CellMeasurer";
+import Masonry from "./Masonry";
+
+import useInfiniteLoadHandler from "@/hooks/useInfiniteLoadHandler";
+import { handleNextPageParam } from "@/utils/infiniteQuery";
+import { Spinner } from "@/components/Spinner";
+import { cn } from "@/utils/cn";
+import { ApiResponse, GifResponse, PaginationParams } from "@/services/type";
+
+type Props = {
+  id: string;
+  fetchGifList: (payload: PaginationParams) => Promise<ApiResponse<GifResponse[]>>;
+};
+
+// Gif List components show list of gif with receive {fetchGifList} Promise
+export default function GifList({ id, fetchGifList }: Props) {
+  // Setup infinite query for {fetchGifList} Promise
+  const {
+    data: gifListRes,
+    isFetched,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    isRefetching,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: [id],
+    initialPageParam: 0,
+    staleTime: 3600,
+    gcTime: 3600,
+    refetchOnWindowFocus: false,
+    queryFn: ({ pageParam }) => {
+      return fetchGifList({ offset: pageParam });
+    },
+    getNextPageParam: handleNextPageParam,
+  });
+  // Get last gif ref to assign to last element of the list gif
+  const lastGifRef = useInfiniteLoadHandler({
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  });
+
+  // Get width height of the parent masonry element to pass down to masonry element and calculate width column
+  const { ref, width, height } = useElementSize();
+
+  const gifs = React.useMemo(
+    // Filter duplicated data in case of changing in ranking trending gifs
+    () => uniqBy(gifListRes?.pages?.map((item) => item.data || [])?.flat() ?? [], "id"),
+    [gifListRes],
+  );
+
+  // Default sizes help Masonry decide how many images to batch-measure
+  const cache: CellMeasurerCacheInterface = React.useMemo(
+    () =>
+      new CellMeasurerCache({
+        defaultWidth: (width - 32) / 4,
+        fixedWidth: true,
+      }),
+    [width],
+  );
+
+  // Masonry layout will use 4 columns with a 8px gutter between
+  const cellPositioner = React.useMemo(
+    () =>
+      createMasonryCellPositioner({
+        cellMeasurerCache: cache,
+        columnCount: 4,
+        columnWidth: (width - 32) / 4,
+        spacer: 8,
+      }),
+    [cache, width],
+  );
+
+  return (
+    <div className="flex flex-grow flex-col relative">
+      {!isFetching && isFetched && gifs.length === 0 && (
+        <div className="text-xl font-bold text-center">No gif found</div>
+      )}
+      <div ref={ref} className="flex grow">
+        <Masonry
+          gifs={gifs}
+          cache={cache}
+          lastGifRef={lastGifRef}
+          cellPositioner={cellPositioner}
+          height={height}
+          width={width}
+        />
+      </div>
+      {!isRefetching && (isFetching || isFetchingNextPage) && (
+        <div className={cn("absolute left-1/2 translate-x-1/2", isFetchingNextPage ? "top-full bottom-4" : "top-4")}>
+          <Spinner />
+        </div>
+      )}
+    </div>
+  );
+}
