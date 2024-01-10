@@ -2,7 +2,7 @@ import { ApiResponse, Body } from "./type";
 
 type RequestConfig = {
   headers?: HeadersInit;
-  params?: Record<string, any>;
+  params?: Record<string, string>;
   cache?: RequestCache;
 };
 

@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+
 import "intersection-observer";
 global.ResizeObserver = require("resize-observer-polyfill");
 

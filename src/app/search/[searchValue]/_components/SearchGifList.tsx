@@ -7,8 +7,8 @@ import service from "@/services";
 export default function SearchGifList({ searchValue }: { searchValue: string }) {
   return (
     <GifList
-      id={`${service.getGifs.name}-${searchValue}`}
       fetchGifList={(payload) => service.getGifs({ ...payload, q: searchValue })}
+      id={`${service.getGifs.name}-${searchValue}`}
     />
   );
 }

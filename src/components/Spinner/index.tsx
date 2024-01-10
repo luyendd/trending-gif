@@ -2,18 +2,12 @@ import * as React from "react";
 
 import { cn } from "@/utils/cn";
 
-type ExtendableComponentProps<C extends React.ElementType, P extends Record<string, unknown> = {}> = Omit<
-  React.ComponentPropsWithoutRef<C>,
-  keyof P
-> &
-  P;
+import { IconProps } from "../icons/props";
 
-type Props = ExtendableComponentProps<"svg">;
-
-export function Spinner({ className, ...rest }: Props): React.ReactElement {
+export function Spinner({ className, ...rest }: IconProps): React.ReactElement {
   return (
     <svg
-      className={cn("animate-spin text-blue-400 w-8 h-8", className)}
+      className={cn("h-8 w-8 animate-spin text-blue-400", className)}
       fill="none"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"

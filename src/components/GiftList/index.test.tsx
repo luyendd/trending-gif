@@ -1,14 +1,15 @@
-import { afterEach, describe, vi, beforeAll, expect, test } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { http, HttpResponse } from "msw";
 import { faker } from "@faker-js/faker";
+import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
+import { afterEach, beforeAll, describe, expect, test,vi } from "vitest";
+
+import startServer from "@/mocks/startServer";
+import { Providers } from "@/providers";
+import service from "@/services";
+import { GifResponse } from "@/services/type";
 
 import GifList from ".";
-import service from "@/services";
-import { Providers } from "@/providers";
-import startServer from "@/mocks/startServer";
-import { userEvent } from "@testing-library/user-event";
-import { GifResponse } from "@/services/type";
 
 function createGif(_: null, idx: number): GifResponse {
   return {
@@ -281,7 +282,7 @@ describe("Test gift list component", () => {
     const user = userEvent.setup();
     render(
       <Providers>
-        <GifList id="gift-list-test" fetchGifList={(payload) => service.getTrendingGifs(payload)} />
+        <GifList fetchGifList={(payload) => service.getTrendingGifs(payload)} id="gift-list-test" />
       </Providers>,
     );
     const firstItem = data[0];

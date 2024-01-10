@@ -1,18 +1,19 @@
 "use client";
 
 import React from "react";
+import { useElementSize } from "@mantine/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import uniqBy from "lodash/uniqBy";
-import { CellMeasurerCache, MasonryProps, createMasonryCellPositioner } from "react-virtualized";
-import { useElementSize } from "@mantine/hooks";
+import { CellMeasurerCache, createMasonryCellPositioner,MasonryProps } from "react-virtualized";
 import { CellMeasurerCacheInterface } from "react-virtualized/dist/es/CellMeasurer";
-import Masonry from "./Masonry";
 
-import useInfiniteLoadHandler from "@/hooks/useInfiniteLoadHandler";
-import { handleNextPageParam } from "@/utils/infiniteQuery";
 import { Spinner } from "@/components/Spinner";
-import { cn } from "@/utils/cn";
+import useInfiniteLoadHandler from "@/hooks/useInfiniteLoadHandler";
 import { ApiResponse, GifResponse, PaginationParams } from "@/services/type";
+import { cn } from "@/utils/cn";
+import { handleNextPageParam } from "@/utils/infiniteQuery";
+
+import Masonry from "./Masonry";
 
 type Props = {
   id: string;
@@ -82,23 +83,23 @@ export default function GifList({ id, masonryProps, fetchGifList }: Props) {
   );
 
   return (
-    <div className="flex flex-grow flex-col relative">
+    <div className="relative flex grow flex-col">
       {!isFetching && isFetched && gifs.length === 0 && (
-        <div className="text-xl font-bold text-center">No gif found</div>
+        <div className="text-center text-xl font-bold">No gif found</div>
       )}
-      <div ref={ref} className="flex grow">
+      <div className="flex grow" ref={ref}>
         <Masonry
-          gifs={gifs}
           cellMeasurerCache={cache}
-          lastGifRef={lastGifRef}
           cellPositioner={cellPositioner}
+          gifs={gifs}
           height={height}
+          lastGifRef={lastGifRef}
           width={width}
           {...masonryProps}
         />
       </div>
       {!isRefetching && (isFetching || isFetchingNextPage) && (
-        <div className={cn("absolute left-1/2 translate-x-1/2", isFetchingNextPage ? "top-full bottom-4" : "top-4")}>
+        <div className={cn("absolute left-1/2 translate-x-1/2", isFetchingNextPage ? "bottom-4 top-full" : "top-4")}>
           <Spinner />
         </div>
       )}

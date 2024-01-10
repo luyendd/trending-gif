@@ -1,15 +1,16 @@
 import React from "react";
 import {
   CellMeasurer,
+  Masonry as ReactVirtualizedMasonry,
   MasonryCellProps,
   MasonryProps,
   Positioner,
-  Masonry as ReactVirtualizedMasonry,
 } from "react-virtualized";
 import { CellMeasurerCacheInterface } from "react-virtualized/dist/es/CellMeasurer";
 
-import generateBlurImg from "@/utils/generateBlurImg";
 import { GifResponse } from "@/services/type";
+import generateBlurImg from "@/utils/generateBlurImg";
+
 import GifItem from "./GifItem";
 
 type Props = Partial<MasonryProps> & {
@@ -44,7 +45,7 @@ export default function Masonry({ gifs, lastGifRef, cellMeasurerCache, ...props 
       return (
         <CellMeasurer cache={cellMeasurerCache} index={index} key={key} parent={parent}>
           <div ref={index === gifs.length - 1 ? lastGifRef : null} style={style}>
-            <GifItem gif={gif} width={width} height={height} blurImg={blurImg.current[gif.id]} />
+            <GifItem blurImg={blurImg.current[gif.id]} gif={gif} height={height} width={width} />
           </div>
         </CellMeasurer>
       );
@@ -54,10 +55,10 @@ export default function Masonry({ gifs, lastGifRef, cellMeasurerCache, ...props 
 
   return (
     <ReactVirtualizedMasonry
-      cellMeasurerCache={cellMeasurerCache}
-      cellCount={gifs.length}
-      cellRenderer={cellRenderer}
       autoHeight={false}
+      cellCount={gifs.length}
+      cellMeasurerCache={cellMeasurerCache}
+      cellRenderer={cellRenderer}
       {...props}
     />
   );
