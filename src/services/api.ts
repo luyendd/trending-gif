@@ -2,7 +2,7 @@ import { ApiResponse, Body } from "./type";
 
 type RequestConfig = {
   headers?: HeadersInit;
-  params?: Record<string, any>;
+  params?: Record<string, number | string | boolean>;
   cache?: RequestCache;
 };
 
@@ -37,7 +37,7 @@ export class Api {
     const keys = Object.keys(params);
     for (const k of keys) {
       if (params[k] !== null && params[k] !== undefined) {
-        _url.searchParams.append(k, encodeURI(params[k]));
+        _url.searchParams.append(k, encodeURI(params[k].toString()));
       }
     }
     return _url.href;

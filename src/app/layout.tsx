@@ -1,9 +1,11 @@
-import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import HomeSearch from "./_components/HomeSearch";
+import Image from "next/image";
+import Link from "next/link";
+
 import { Providers } from "@/providers";
+
+import HomeSearch from "./_components/HomeSearch";
 
 import "./globals.css";
 
@@ -20,10 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <main className="flex flex-col mx-auto max-w-[1088px] px-4 pb-8 space-y-8 min-h-screen">
+          <main className="mx-auto flex min-h-screen max-w-[1088px] flex-col space-y-8 px-4 pb-8">
             <div className="space-y-2">
               <Link className="block h-20 w-20" href="/">
-                <Image alt="logo" src="/logo.svg" height={80} width={80} />
+                <Image alt="logo" height={80} src="/logo.svg" width={80} />
               </Link>
               <HomeSearch />
             </div>

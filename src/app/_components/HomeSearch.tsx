@@ -1,9 +1,9 @@
 "use client";
 
 import React, { Key } from "react";
+import { useRouter } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import Autocomplete, { SelectItem } from "@/components/Autocomplete";
 import { DEBOUNCE_TIME } from "@/constants";
@@ -94,19 +94,19 @@ export default function HomeSearch() {
 
   return (
     <Autocomplete
-      ref={ref}
       aria-label="home-search-input"
       id="home-search-input"
+      inputValue={searchValue}
       isLoading={isLoading}
       items={items}
-      placeholder="Search for all the Gifs"
-      onInputChange={setSearchValue}
-      inputValue={searchValue}
-      onSelectionChange={handleSelectionChange}
-      searchIconProps={{ onClick: handleRedirect, "aria-label": "Search combobox icon" }}
-      onKeyDown={handleKeyDown}
-      allowsEmptyCollection
       menuTrigger="focus"
+      placeholder="Search for all the Gifs"
+      ref={ref}
+      searchIconProps={{ onClick: handleRedirect, "aria-label": "Search combobox icon" }}
+      allowsEmptyCollection
+      onInputChange={setSearchValue}
+      onKeyDown={handleKeyDown}
+      onSelectionChange={handleSelectionChange}
     />
   );
 }

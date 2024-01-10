@@ -1,7 +1,8 @@
-import { expect, test } from "vitest";
+import { faker } from "@faker-js/faker";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { faker } from "@faker-js/faker";
+import { expect, test } from "vitest";
+
 import Autocomplete, { SelectItem } from ".";
 
 const data: SelectItem[] = new Array(2).fill(null).map(() => ({
@@ -14,10 +15,10 @@ test("Autocomplete will be able to select/ deselect item", async () => {
   render(
     <Autocomplete
       aria-label="autocomplete"
+      clearButtonProps={{ "aria-label": "Clear button" }}
+      data-testid="autocomplete"
       id="autocomplete"
       items={data}
-      data-testid="autocomplete"
-      clearButtonProps={{ "aria-label": "Clear button" }}
     />,
   );
   const autocompleteComponent = screen.getByTestId<HTMLInputElement>("autocomplete");
