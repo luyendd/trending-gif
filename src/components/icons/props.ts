@@ -1,11 +1,6 @@
 import { MouseEvent } from "react";
 
-interface Styleable {
-  className?: string;
-  style?: React.CSSProperties;
-}
-
-export interface IconProps extends Styleable {
+export interface IconProps extends React.SVGProps<SVGSVGElement> {
   color?: string;
   width?: number;
   height?: number;

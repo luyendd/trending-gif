@@ -1,25 +1,35 @@
 import { expect, test } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Autocomplete from ".";
+import { faker } from "@faker-js/faker";
+import Autocomplete, { SelectItem } from ".";
 
-const data = [
-  {
-    label: "test",
-    value: "test",
-  },
-];
+const data: SelectItem[] = new Array(2).fill(null).map(() => ({
+  label: faker.animal.cat(),
+  value: faker.animal.cat(),
+}));
 
-test("Autocomplete will be able to select item", async () => {
+test("Autocomplete will be able to select/ deselect item", async () => {
   const user = userEvent.setup();
-  const { getByText } = render(
-    <Autocomplete aria-label="test" id="test" items={data} placeholder="test placeholder" />,
+  render(
+    <Autocomplete
+      aria-label="autocomplete"
+      id="autocomplete"
+      items={data}
+      data-testid="autocomplete"
+      clearButtonProps={{ "aria-label": "Clear button" }}
+    />,
   );
-  const autocompleteComponent = screen.getByPlaceholderText("test placeholder");
+  const autocompleteComponent = screen.getByTestId<HTMLInputElement>("autocomplete");
   expect(autocompleteComponent).toBeDefined();
   await user.click(autocompleteComponent);
-  const testItem = getByText("test");
-  expect(testItem).toBeDefined();
-  await user.click(testItem);
-  expect(getByText("test")).toBeDefined();
+  const firstItem = data[0];
+  const secondItem = data[1];
+  const firstOption = screen.getByText(firstItem.label);
+  expect(screen.getByText(secondItem.label)).toBeDefined();
+  await user.click(firstOption);
+  expect(autocompleteComponent.value).toEqual(firstItem.label);
+  const clearBtn = screen.getByLabelText<HTMLButtonElement>("Clear button");
+  await user.click(clearBtn);
+  expect(autocompleteComponent.value).toBe("");
 });

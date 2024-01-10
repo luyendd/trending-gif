@@ -33,11 +33,19 @@ export type TrendingGifsParams = {
 
 export type ImageStaticResponse = { height: number; width: number; size: number; url: string };
 export type FullImageResponse = {
-  mp4_size: string;
+  mp4_size: number;
   mp4: string;
-  webp_size: string;
+} & WebpImageResponse;
+export type WebpImageResponse = ImageStaticResponse & {
+  webp_size: number;
   webp: string;
-} & ImageStaticResponse;
+};
+export type MP4ImageResponse = {
+  height: number;
+  width: number;
+  mp4_size: number;
+  mp4: string;
+};
 
 export type GifResponse = {
   type: string;
@@ -51,6 +59,7 @@ export type GifResponse = {
   title: string; // The title that appears on giphy.com for this GIF.
   rating: string; // The MPAA-style rating for this content. Examples include Y, G, PG, PG-13 and R
   tags: string[]; // List of channel tags
+  featured_tags: string[];
   source_tld: string; // The top level domain of the source URL.
   source_post_url: string; // The URL of the webpage on which this GIF was found.
   is_hidden: number;
@@ -65,37 +74,37 @@ export type GifResponse = {
   update_datetime: string;
   // Images Object found in the GIF Object contains a series of Rendition Objects: https://developers.giphy.com/docs/optional-settings/#rendition-guide
   images: {
-    original: { frames: string; hash: string } & FullImageResponse;
+    original: { frames: number; hash: string } & FullImageResponse;
     downsized: ImageStaticResponse;
     downsized_large: ImageStaticResponse;
     downsized_medium: ImageStaticResponse;
-    downsized_small: ImageStaticResponse;
+    downsized_small: MP4ImageResponse;
     downsized_still: ImageStaticResponse;
     fixed_height: FullImageResponse;
-    fixed_height_downsampled: FullImageResponse;
+    fixed_height_downsampled: WebpImageResponse;
     fixed_height_small: FullImageResponse;
-    fixed_height_small_still: FullImageResponse;
-    fixed_height_still: FullImageResponse;
+    fixed_height_small_still: ImageStaticResponse;
+    fixed_height_still: ImageStaticResponse;
     fixed_width: FullImageResponse;
     fixed_width_downsampled: FullImageResponse;
     fixed_width_small: FullImageResponse;
     fixed_width_small_still: ImageStaticResponse;
     fixed_width_still: ImageStaticResponse;
     looping: {
-      mp4_size: string;
+      mp4_size: number;
       mp4: string;
     };
     original_still: ImageStaticResponse;
-    original_mp4: ImageStaticResponse;
-    preview: Omit<FullImageResponse, "url" | "size">;
+    original_mp4: MP4ImageResponse;
+    preview: MP4ImageResponse;
     preview_gif: ImageStaticResponse;
     preview_webp: ImageStaticResponse;
     source: ImageStaticResponse;
-    hd: Omit<FullImageResponse, "url" | "size">;
+    hd?: Omit<FullImageResponse, "url" | "size">;
     "480w_still": ImageStaticResponse;
   };
   // User Object
-  user: {
+  user?: {
     id: number;
     avatar_url: string;
     banner_image: string;

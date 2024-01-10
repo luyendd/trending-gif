@@ -1,21 +1,21 @@
-import { useCallback, useRef } from "react";
+import React from "react";
 
 type Props = {
   isFetching: boolean;
   isFetchingNextPage: boolean;
   hasNextPage: boolean | undefined;
-  fetchNextPage: () => Promise<any>;
+  fetchNextPage: () => Promise<unknown>;
 };
 
 // This hook Intersection Observer to detect when user reach the return Ref element
-export default function useInfiniteLoadHandler<TElement extends HTMLImageElement & HTMLDivElement & HTMLElement>({
+export default function useInfiniteLoadHandler<TElement extends HTMLImageElement | HTMLDivElement | HTMLElement>({
   isFetching,
   isFetchingNextPage,
   hasNextPage,
   fetchNextPage,
 }: Props) {
-  const observer = useRef<IntersectionObserver>();
-  const lastItemRef = useCallback(
+  const observer = React.useRef<IntersectionObserver>();
+  const lastItemRef = React.useCallback(
     (node: TElement) => {
       if (isFetching || isFetchingNextPage) {
         return;

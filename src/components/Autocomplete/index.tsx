@@ -1,20 +1,25 @@
-import React from "react";
+import React, { Ref } from "react";
 import { Autocomplete as NextUIAutocomplete, AutocompleteItem, AutocompleteProps } from "@nextui-org/react";
 import { SearchIcon } from "../icons/SearchIcon";
+import { IconProps } from "../icons/props";
 
 export type SelectItem = { label: string; value: string; isReadOnly?: boolean };
 
 type Props = {
-  onClickSelectorIcon?: () => void; // Handle click in search icon
+  searchIconProps?: IconProps;
 };
 
 // Read more at official docs: https://nextui.org/docs/components/autocomplete
-export default function Autocomplete(props: Omit<AutocompleteProps<SelectItem> & Props, "children">) {
+const AutocompleteWrapper = React.forwardRef(function Autocomplete(
+  { searchIconProps, ...props }: Omit<AutocompleteProps<SelectItem> & Props, "children">,
+  ref: Ref<HTMLInputElement>,
+) {
   return (
     <NextUIAutocomplete
+      ref={ref}
       allowsCustomValue
       isClearable
-      selectorIcon={<SearchIcon onClick={props.onClickSelectorIcon} />}
+      selectorIcon={<SearchIcon {...searchIconProps} />}
       disableSelectorIconRotation
       {...props}
     >
@@ -30,4 +35,6 @@ export default function Autocomplete(props: Omit<AutocompleteProps<SelectItem> &
       )}
     </NextUIAutocomplete>
   );
-}
+});
+
+export default AutocompleteWrapper;

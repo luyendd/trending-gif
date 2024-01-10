@@ -1,21 +1,27 @@
 import React from "react";
-import { CellMeasurer, MasonryCellProps, Positioner, Masonry as ReactVirtualizedMasonry } from "react-virtualized";
+import {
+  CellMeasurer,
+  MasonryCellProps,
+  MasonryProps,
+  Positioner,
+  Masonry as ReactVirtualizedMasonry,
+} from "react-virtualized";
 import { CellMeasurerCacheInterface } from "react-virtualized/dist/es/CellMeasurer";
 
 import generateBlurImg from "@/utils/generateBlurImg";
 import { GifResponse } from "@/services/type";
 import GifItem from "./GifItem";
 
-type Props = {
+type Props = Partial<MasonryProps> & {
   gifs: GifResponse[];
-  cache: CellMeasurerCacheInterface;
-  lastGifRef: (node: HTMLImageElement & HTMLDivElement & HTMLElement) => void;
   cellPositioner: Positioner;
-  height: number;
+  cellMeasurerCache: CellMeasurerCacheInterface;
   width: number;
+  height: number;
+  lastGifRef: (node: HTMLImageElement & HTMLDivElement & HTMLElement) => void;
 };
 
-export default function Masonry({ gifs, cache, lastGifRef, cellPositioner, height, width }: Props) {
+export default function Masonry({ gifs, lastGifRef, cellMeasurerCache, ...props }: Props) {
   const blurImg = React.useRef<{ [key: string]: string }>({});
 
   // Callback to render each cell
@@ -36,25 +42,23 @@ export default function Masonry({ gifs, cache, lastGifRef, cellPositioner, heigh
       }
 
       return (
-        <CellMeasurer cache={cache} index={index} key={key} parent={parent}>
+        <CellMeasurer cache={cellMeasurerCache} index={index} key={key} parent={parent}>
           <div ref={index === gifs.length - 1 ? lastGifRef : null} style={style}>
             <GifItem gif={gif} width={width} height={height} blurImg={blurImg.current[gif.id]} />
           </div>
         </CellMeasurer>
       );
     },
-    [cache, gifs, lastGifRef],
+    [cellMeasurerCache, gifs, lastGifRef],
   );
 
   return (
     <ReactVirtualizedMasonry
+      cellMeasurerCache={cellMeasurerCache}
       cellCount={gifs.length}
-      cellMeasurerCache={cache}
-      cellPositioner={cellPositioner}
       cellRenderer={cellRenderer}
-      height={height}
-      width={width}
       autoHeight={false}
+      {...props}
     />
   );
 }

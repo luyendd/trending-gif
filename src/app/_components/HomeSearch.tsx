@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Key } from "react";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ export default function HomeSearch() {
   // Setup debounce for search input to prevent calling too many unnecessary requests
   const [debouncedSearchTerm] = useDebouncedValue(searchValue, DEBOUNCE_TIME);
   const router = useRouter();
+  const ref = React.useRef<HTMLInputElement>(null);
 
   // Get trending searches to set initial data for Autocomplete component
   const { data: trendingSearches } = useQuery({
@@ -54,8 +55,8 @@ export default function HomeSearch() {
   );
 
   const items = React.useMemo(
-    () => (debouncedSearchTerm ? selectTags : trendingSelect),
-    [debouncedSearchTerm, trendingSelect, selectTags],
+    () => (searchValue && debouncedSearchTerm ? selectTags : trendingSelect),
+    [searchValue, debouncedSearchTerm, selectTags, trendingSelect],
   );
 
   // Handle redirect action
@@ -73,23 +74,39 @@ export default function HomeSearch() {
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
+        e.preventDefault();
         handleRedirect();
       }
     },
     [handleRedirect],
   );
 
+  // Handle selection change
+  const handleSelectionChange = (key: Key) => {
+    if (key) {
+      if (ref.current) {
+        ref.current.blur();
+      }
+      setSearchValue(key.toString());
+      router.push(`/search/${key}`);
+    }
+  };
+
   return (
     <Autocomplete
+      ref={ref}
       aria-label="home-search-input"
       id="home-search-input"
       isLoading={isLoading}
       items={items}
       placeholder="Search for all the Gifs"
       onInputChange={setSearchValue}
-      onSelectionChange={(key) => router.push(`/search/${key}`)}
+      inputValue={searchValue}
+      onSelectionChange={handleSelectionChange}
+      searchIconProps={{ onClick: handleRedirect, "aria-label": "Search combobox icon" }}
       onKeyDown={handleKeyDown}
-      onClickSelectorIcon={handleRedirect}
+      allowsEmptyCollection
+      menuTrigger="focus"
     />
   );
 }

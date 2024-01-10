@@ -3,7 +3,7 @@
 import React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import uniqBy from "lodash/uniqBy";
-import { CellMeasurerCache, createMasonryCellPositioner } from "react-virtualized";
+import { CellMeasurerCache, MasonryProps, createMasonryCellPositioner } from "react-virtualized";
 import { useElementSize } from "@mantine/hooks";
 import { CellMeasurerCacheInterface } from "react-virtualized/dist/es/CellMeasurer";
 import Masonry from "./Masonry";
@@ -16,11 +16,12 @@ import { ApiResponse, GifResponse, PaginationParams } from "@/services/type";
 
 type Props = {
   id: string;
+  masonryProps?: Partial<MasonryProps>;
   fetchGifList: (payload: PaginationParams) => Promise<ApiResponse<GifResponse[]>>;
 };
 
 // Gif List components show list of gif with receive {fetchGifList} Promise
-export default function GifList({ id, fetchGifList }: Props) {
+export default function GifList({ id, masonryProps, fetchGifList }: Props) {
   // Setup infinite query for {fetchGifList} Promise
   const {
     data: gifListRes,
@@ -88,11 +89,12 @@ export default function GifList({ id, fetchGifList }: Props) {
       <div ref={ref} className="flex grow">
         <Masonry
           gifs={gifs}
-          cache={cache}
+          cellMeasurerCache={cache}
           lastGifRef={lastGifRef}
           cellPositioner={cellPositioner}
           height={height}
           width={width}
+          {...masonryProps}
         />
       </div>
       {!isRefetching && (isFetching || isFetchingNextPage) && (
