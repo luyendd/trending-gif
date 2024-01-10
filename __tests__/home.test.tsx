@@ -1,13 +1,14 @@
-import { expect, test } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Providers } from "@/providers";
+import { expect, test } from "vitest";
+
+import RootLayout from "@/app/layout";
 import HomePage from "@/app/page";
 
 test("Home Page", () => {
   render(
-    <Providers>
+    <RootLayout>
       <HomePage />
-    </Providers>,
+    </RootLayout>,
   );
   expect(screen.getByRole("heading", { level: 1, name: "Trending Gifs" })).toBeDefined();
 });

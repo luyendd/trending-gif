@@ -1,12 +1,14 @@
-import { loadEnv } from "vite";
-import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
 import { resolve } from "node:path";
 
-export default ({ mode }: { mode: string }) => {
+import react from "@vitejs/plugin-react";
+import { loadEnv } from "vite";
+// import tsconfigPaths from "vite-tsconfig-paths";
+import { configDefaults, defineConfig, UserConfig } from "vitest/config";
+
+const vitestConfig = ({ mode }: { mode: string }): UserConfig => {
   // Load app-level env vars to node-level env vars.
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
-
+  const exclude = [...configDefaults.exclude, "**.config.**", "./src/services", ".next", ".eslintrc.js", "**/**.d.ts"];
   return defineConfig({
     plugins: [react()],
     test: {
@@ -23,12 +25,14 @@ export default ({ mode }: { mode: string }) => {
           functions: 80,
           statements: 80,
         },
+        exclude,
       },
+      exclude,
       setupFiles: ["dotenv/config", "./src/mocks/setup"],
     },
     resolve: {
       alias: [{ find: "@", replacement: resolve(__dirname, "./src") }],
     },
-    envDir: ".env",
   });
 };
+export default vitestConfig;
