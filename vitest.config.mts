@@ -15,7 +15,14 @@ export default ({ mode }: { mode: string }) => {
       globals: true,
       coverage: {
         provider: "v8",
-        reporter: ["text", "json", "html"],
+        reporter: ["text", "json", "json-summary", "html"],
+        reportOnFailure: true,
+        thresholds: {
+          lines: 80,
+          branches: 80,
+          functions: 80,
+          statements: 80,
+        },
       },
       setupFiles: ["dotenv/config", "./src/mocks/setup"],
     },
