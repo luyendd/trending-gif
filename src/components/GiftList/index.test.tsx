@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
-import { afterEach, beforeAll, describe, expect, test,vi } from "vitest";
+import { delay, http, HttpResponse } from "msw";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 
 import startServer from "@/mocks/startServer";
 import { Providers } from "@/providers";
@@ -241,12 +241,14 @@ function createGif(_: null, idx: number): GifResponse {
     alt_text: faker.lorem.words(),
   };
 }
-const data: GifResponse[] = new Array(10).fill(null).map(createGif);
+
+const trendingGifs: GifResponse[] = new Array(10).fill(null).map(createGif);
+const duplicatedData: GifResponse[] = new Array(2).fill(createGif(null, 0));
 
 startServer([
   http.get(`${process.env.NEXT_PUBLIC_API_URL}/gifs/trending`, () =>
     HttpResponse.json({
-      data,
+      data: trendingGifs,
       pagination: {
         total_count: 40,
         count: 10,
@@ -259,6 +261,34 @@ startServer([
       },
     }),
   ),
+  http.get(`${process.env.NEXT_PUBLIC_API_URL}/gifs/search`, async (info) => {
+    const query = new URLSearchParams(info.request.url).get("q");
+    const data = (function getData() {
+      switch (query) {
+        case "duplicate":
+          return duplicatedData;
+        default:
+          return [];
+      }
+    })();
+
+    if (!query) {
+      await delay();
+    }
+    return HttpResponse.json({
+      data,
+      pagination: {
+        total_count: data.length,
+        count: data.length,
+        offset: 0,
+      },
+      meta: {
+        status: 200,
+        msg: "OK",
+        response_id: "test",
+      },
+    });
+  }),
 ]);
 
 describe("Test gift list component", () => {
@@ -278,23 +308,48 @@ describe("Test gift list component", () => {
     vi.restoreAllMocks();
   });
 
-  test("Gif list will be able to show infinite gifs", async () => {
+  test("Gif list should show infinite gifs", async () => {
     const user = userEvent.setup();
     render(
       <Providers>
         <GifList fetchGifList={(payload) => service.getTrendingGifs(payload)} id="gift-list-test" />
       </Providers>,
     );
-    const firstItem = data[0];
+    const firstItem = trendingGifs[0];
     const firstGifItem = await screen.findByAltText(firstItem.alt_text);
     await user.click(firstGifItem);
     if (firstItem.user) expect(await screen.findByText(firstItem.user.display_name)).toBeDefined();
     else expect(await screen.findByText(firstItem.tags.join(" "))).toBeDefined();
+    await user.click(screen.getAllByLabelText("Gif close detail")[0]);
+    if (firstItem.user) expect(screen.queryByText(firstItem.user.display_name)).toBeNull();
+    else expect(screen.queryByText(firstItem.tags.join(" "))).toBeNull();
 
-    const secondItem = data[1];
+    const secondItem = trendingGifs[1];
     const secondGifItem = await screen.findByAltText(secondItem.alt_text);
     await user.click(secondGifItem);
     if (secondItem.user) expect(await screen.findByText(secondItem.user.display_name)).toBeDefined();
     else expect(await screen.findByText(secondItem.tags.join(" "))).toBeDefined();
+  });
+
+  test("Gif list should show empty and loading states", async () => {
+    render(
+      <Providers>
+        <GifList fetchGifList={() => service.getGifs({ q: "" })} id="gift-list-test" />
+      </Providers>,
+    );
+    expect(await screen.findByLabelText("Spinner Loading")).toBeDefined();
+    await waitFor(async () => {
+      expect(await screen.findByText(/no gif found/i)).toBeDefined();
+      expect(screen.queryByLabelText("Spinner Loading")).toBeNull();
+    });
+  });
+
+  test("Gif list should remove duplicate id", async () => {
+    render(
+      <Providers>
+        <GifList fetchGifList={() => service.getGifs({ q: "duplicate" })} id="gift-list-test" />
+      </Providers>,
+    );
+    expect(await screen.findAllByAltText(duplicatedData[0].alt_text)).toHaveLength(1);
   });
 });

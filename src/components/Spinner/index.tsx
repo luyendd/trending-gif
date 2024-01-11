@@ -7,6 +7,7 @@ import { IconProps } from "../icons/props";
 export function Spinner({ className, ...rest }: IconProps): React.ReactElement {
   return (
     <svg
+      aria-label="Spinner Loading"
       className={cn("h-8 w-8 animate-spin text-blue-400", className)}
       fill="none"
       viewBox="0 0 24 24"
