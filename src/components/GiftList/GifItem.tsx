@@ -58,7 +58,11 @@ export default function GifItem({
                 )}
               </div>
               <div className="h-5 w-5">
-                <CloseIcon className="h-5 w-5 cursor-pointer" onClick={() => setIsShowDetail(false)} />
+                <CloseIcon
+                  aria-label="Gif close detail"
+                  className="h-5 w-5 cursor-pointer"
+                  onClick={() => setIsShowDetail(false)}
+                />
               </div>
             </div>
             <div className="line-clamp-2 break-words text-sm">{gif.title}</div>

@@ -4,7 +4,7 @@ import React from "react";
 import { useElementSize } from "@mantine/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import uniqBy from "lodash/uniqBy";
-import { CellMeasurerCache, createMasonryCellPositioner,MasonryProps } from "react-virtualized";
+import { CellMeasurerCache, createMasonryCellPositioner, MasonryProps } from "react-virtualized";
 import { CellMeasurerCacheInterface } from "react-virtualized/dist/es/CellMeasurer";
 
 import { Spinner } from "@/components/Spinner";
